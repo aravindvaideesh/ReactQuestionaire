@@ -1,27 +1,36 @@
 import React from 'react';
+import { Button, Form, FormControl, FormGroup, ControlLabel } from 'react-bootstrap';
 
-const ChoiceList = ({ selectedQuestion, handleQuestionChange, addChoice, handleChoiceChange }) => {
+const ChoiceList = ({ questionList, selectedQuestion, handleQuestionChange, addChoice, deleteChoice, handleChoiceChange }) => {
+  //console.log('Question ' + JSON.stringify(selectedQuestion, null, 3));
   const listItems = selectedQuestion.choices.map((choiceItem, index) =>
-    <div key={choiceItem}>
+    <div key={index}>
       <li>
         <label>Option {index + 1} </label>
-        <input type="text" value={choiceItem} onChange={(e) => handleChoiceChange(index, e)} />
+        <input type="text" name={index} value={choiceItem} onChange={handleChoiceChange} />
       </li>
     </div>
   );
   return (
     <div>
-      <h3>Design your Questions </h3>
-      <div className="row">
-        <label className="col-md-6">Question</label><input className="col-md-6" type="text" value={selectedQuestion.question} onChange={handleQuestionChange} />
-      </div>
+      <h5>Design your Questions </h5>
+          <Form inline>
+            <FormGroup controlId="formInlineName">
+              <ControlLabel>Question</ControlLabel>
+              {' '}
+              <FormControl type="text" disabled={questionList.length === 0} value={selectedQuestion.question} onChange={handleQuestionChange} />
+            </FormGroup>
+            </Form>
       <div>
         {listItems}
       </div>
       <div>
-        <button onClick={addChoice} disabled={selectedQuestion.question === ""}>
+          <Button bsStyle="primary" onClick={addChoice} disabled={selectedQuestion.question === "" || selectedQuestion.choices.length === 6}>
           ADD
-    </button>
+          </Button>
+          <Button bsStyle="primary" onClick={deleteChoice} disabled={selectedQuestion.question === "" || selectedQuestion.choices.length === 0}>
+          DELETE
+          </Button>
       </div>
     </div>
   )

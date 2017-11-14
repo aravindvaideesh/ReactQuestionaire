@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { Grid, Row, Col } from 'react-bootstrap';
 import _ from 'lodash'
 
 import QuestionList from '../components/QuestionList';
@@ -78,6 +79,27 @@ export default class MainSection extends Component {
     this.setState({ questionList: questionList, selectedQuestion: newQuestion })
   }
 
+  deleteChoice = () => {
+    let { selectedQuestion, questionList } = this.state;
+    let quesIndex = _.findIndex(questionList, selectedQuestion);
+    let newQuestion = {};
+    if (quesIndex > -1) {
+      questionList = _.map(questionList, (questionItem, index) => {
+        if (index === quesIndex) {
+          newQuestion = {
+            question: selectedQuestion.question,
+            choices: _.filter(selectedQuestion.choices, (choice, index) => { return index !== selectedQuestion.choices.length - 1}),
+            choiceIterator: selectedQuestion.choiceIterator
+          }
+          return newQuestion;
+        } else {
+          return questionItem;
+        }
+      })
+    }
+    this.setState({ questionList: questionList, selectedQuestion: newQuestion })
+  }
+
   handleQuestionChange = (event) => {
     let { selectedQuestion, questionList } = this.state;
     let quesIndex = _.findIndex(questionList, selectedQuestion);
@@ -99,10 +121,10 @@ export default class MainSection extends Component {
     this.setState({ questionList: questionList, selectedQuestion: newQuestion });
   }
 
-  handleChoiceChange = (choiceIndex, event) => {
+  handleChoiceChange = ({ target }) => {
     let { selectedQuestion, questionList } = this.state;
     let newChoices = selectedQuestion.choices;
-    newChoices[choiceIndex] = event.target.value;
+    newChoices[target.name] = target.value;
     let quesIndex = _.findIndex(questionList, selectedQuestion);
     let newQuestion = {};
     if (quesIndex > -1) {
@@ -126,40 +148,36 @@ export default class MainSection extends Component {
   render() {
 
     const styles = {
-      fontFamily: 'sans-serif',
-      textAlign: 'center',
-      float: 'left',
-      width: '40%',
       height: '800px',
       backgroundColor: '#42A2F1'
     };
 
     const stylesTwo = {
-      float: 'right',
-      width: '60%',
       height: '800px',
       backgroundColor: '#9DD3FF'
     }
 
     return (
-      <div className="container-fluid">
-        <div className="row-fluid">
-          <div className="span2" style={styles}>
+      <Grid>
+        <Row className="show-grid">
+          <Col xs={5} md={4} style={styles}>
             <QuestionList questionList={this.state.questionList}
               addQuestion={this.addQuestion}
               isDeleteModeOn={this.state.isDeleteModeOn}
               deleteMode={this.deleteMode}
               deleteQuestion={this.deleteQuestion}
               onQuestionSelect={this.onQuestionSelect} />
-          </div>
-          <div className="span8" style={stylesTwo}>
-            <ChoiceList selectedQuestion={this.state.selectedQuestion}
+          </Col>
+          <Col xs={7} md={8} style={stylesTwo}>
+            <ChoiceList questionList={this.state.questionList}
+              selectedQuestion={this.state.selectedQuestion}
               handleQuestionChange={this.handleQuestionChange}
               addChoice={this.addChoice}
+              deleteChoice={this.deleteChoice}
               handleChoiceChange={this.handleChoiceChange} />
-          </div>
-        </div>
-      </div>
+          </Col>
+        </Row>
+      </Grid>
     )
   }
 }
